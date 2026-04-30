@@ -40,9 +40,6 @@ MAX_LOGIN_ATTEMPTS = 5
 INACTIVITY_TIMEOUT = 5 * 60 * 1000
 
 
-# ─────────────────────────────────────────────
-# UTILITAIRES
-# ─────────────────────────────────────────────
 
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
@@ -96,9 +93,7 @@ def record_login(username: str):
     save_users(users)
 
 
-# ─────────────────────────────────────────────
-# CAMÉRA — flux intégré dans le panneau droit
-# ─────────────────────────────────────────────
+
 
 class CameraPanel(ctk.CTkFrame):
     """Flux vidéo en direct affiché dans le panneau droit."""
@@ -110,7 +105,7 @@ class CameraPanel(ctk.CTkFrame):
         self._running  = False
         self._cap      = None
 
-        # ── Titre ──
+       
         title_row = ctk.CTkFrame(self, fg_color=BG_HEADER)
         title_row.pack(fill="x")
         ctk.CTkLabel(title_row, text="📷  Caméra",
@@ -119,12 +114,12 @@ class CameraPanel(ctk.CTkFrame):
                       fg_color="#6a1a1a", hover_color="#8a2a2a",
                       command=self.stop).pack(side="right", padx=8, pady=8)
 
-        # ── Affichage vidéo ──
+        
         self.video_label = ctk.CTkLabel(self, text="Démarrage…", font=("Arial", 12),
                                         text_color="#aaa")
         self.video_label.pack(fill="both", expand=True, padx=6, pady=6)
 
-        # ── Statut + bouton photo ──
+        
         self.status_label = ctk.CTkLabel(self, text="", font=("Arial", 11),
                                          text_color="#44ee88")
         self.status_label.pack(pady=(0, 4))
@@ -152,7 +147,7 @@ class CameraPanel(ctk.CTkFrame):
             return
         ret, frame = self._cap.read()
         if ret:
-            # Adapte la taille à la largeur du panneau
+            
             w = max(self.winfo_width() - 12, 180)
             h = int(w * 480 / 640)
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -211,9 +206,7 @@ def make_camera_button(master, panel_ref: dict, right_panel, on_photo=None) -> c
     )
 
 
-# ─────────────────────────────────────────────
-# VOCAL — panneau dans la colonne droite
-# ─────────────────────────────────────────────
+
 
 class VoicePanel(ctk.CTkFrame):
     """Panneau vocal intégré dans le panneau droit (comme CameraPanel)."""
@@ -230,7 +223,7 @@ class VoicePanel(ctk.CTkFrame):
         self._pulse_job    = None
         self._history      = []   # phrases reconnues
 
-        # ── Titre ──────────────────────────────────────────────────────
+        
         title_row = ctk.CTkFrame(self, fg_color=BG_HEADER)
         title_row.pack(fill="x")
         ctk.CTkLabel(title_row, text="🎙  Vocal",
@@ -239,7 +232,7 @@ class VoicePanel(ctk.CTkFrame):
                       fg_color="#6a1a1a", hover_color="#8a2a2a",
                       command=self.stop).pack(side="right", padx=8, pady=8)
 
-        # ── Zone animée (cercle pulsant) ────────────────────────────────
+        
         self.pulse_frame = ctk.CTkFrame(self, fg_color="#1a3a2a", corner_radius=60,
                                         width=120, height=120)
         self.pulse_frame.pack(pady=18)
@@ -248,12 +241,12 @@ class VoicePanel(ctk.CTkFrame):
                                      font=("Arial", 44))
         self.mic_icon.place(relx=0.5, rely=0.5, anchor="center")
 
-        # ── Statut ──────────────────────────────────────────────────────
+        
         self.status_label = ctk.CTkLabel(self, text="Démarrage…",
                                          font=("Arial", 12), text_color="#aaa")
         self.status_label.pack(pady=(0, 8))
 
-        # ── Historique des phrases ──────────────────────────────────────
+
         ctk.CTkLabel(self, text="Phrases reconnues", font=("Arial", 11, "bold"),
                      text_color="#666").pack(anchor="w", padx=12)
         self.history_box = ctk.CTkTextbox(self, fg_color="#1e1e1e", text_color="#cccccc",
@@ -261,7 +254,7 @@ class VoicePanel(ctk.CTkFrame):
                                           state="disabled", corner_radius=8, height=160)
         self.history_box.pack(fill="x", padx=8, pady=(2, 10))
 
-        # ── Bouton micro ────────────────────────────────────────────────
+        
         self.mic_btn = ctk.CTkButton(self, text="⏹ Arrêter l'écoute",
                                      fg_color="#6a1a1a", hover_color="#8a2a2a",
                                      command=self.stop)
@@ -269,7 +262,7 @@ class VoicePanel(ctk.CTkFrame):
 
         self._start()
 
-    # ── Démarrage ──────────────────────────────────────────────────────
+    
 
     def _start(self):
         if not SR_AVAILABLE:
@@ -318,7 +311,7 @@ class VoicePanel(ctk.CTkFrame):
     def _set_status(self, msg: str, color: str):
         self.status_label.configure(text=msg, text_color=color)
 
-    # ── Animation pulsante ──────────────────────────────────────────────
+    
 
     def _start_pulse(self):
         if self._pulse_job:
@@ -343,7 +336,7 @@ class VoicePanel(ctk.CTkFrame):
         except Exception:
             self._pulse_job = None
 
-    # ── Arrêt ───────────────────────────────────────────────────────────
+    
 
     def stop(self):
         self._stop_pulse()
@@ -440,9 +433,6 @@ def make_voice_button(master, panel_ref: dict, right_panel, on_transcript=None) 
     )
     return btn
 
-# ─────────────────────────────────────────────
-# DRAG (sash redimensionnable)
-# ─────────────────────────────────────────────
 
 def create_draggable_sash(container, right_panel):
     sash = ctk.CTkFrame(container, width=6, cursor="sb_h_double_arrow", fg_color="#3a3a3a")
@@ -463,9 +453,6 @@ def create_draggable_sash(container, right_panel):
     return sash
 
 
-# ─────────────────────────────────────────────
-# SYNTAX HIGHLIGHTING
-# ─────────────────────────────────────────────
 
 import re as _re
 
@@ -487,7 +474,7 @@ EXT_TO_LANG = {
     ".r":"R",".m":"MATLAB",".lua":"Lua",".pl":"Perl",
 }
 
-# Couleurs inspirées VS Code Dark+
+
 SH = {
     "keyword":   "#569cd6",
     "builtin":   "#4ec9b0",
@@ -502,15 +489,15 @@ SH = {
     "selector":  "#d7ba7d",
     "property":  "#9cdcfe",
     "operator":  "#d4d4d4",
-    # nouveaux
-    "op_arith":  "#f08080",   # + - * / % **        rouge clair
-    "op_comp":   "#d8a0df",   # == != < > <= >=      violet
-    "op_logic":  "#569cd6",   # && || ! & | ^ ~      bleu
-    "op_assign": "#c586c0",   # = += -= *= /= etc.   magenta
-    "op_arrow":  "#4ec9b0",   # -> => :: .           cyan
-    "bracket_r": "#ffd700",   # ( )                  or
-    "bracket_s": "#da70d6",   # [ ]                  orchidée
-    "bracket_c": "#179fff",   # { }                  bleu vif
+    
+    "op_arith":  "#f08080",   
+    "op_comp":   "#d8a0df",   
+    "op_logic":  "#569cd6",   
+    "op_assign": "#c586c0",  
+    "op_arrow":  "#4ec9b0",   
+    "bracket_r": "#ffd700",   
+    "bracket_s": "#da70d6",   
+    "bracket_c": "#179fff",   
 }
 
 SYNTAX_RULES = {
@@ -586,7 +573,7 @@ SYNTAX_RULES = {
     ],
 }
 
-# ── Règles génériques partagées ──────────────────────────────────────────
+
 _CLIKE_KW = (r"\b(auto|break|case|catch|class|const|continue|default|delete|do|else"
              r"|enum|explicit|extern|false|final|finally|for|friend|goto|if|inline"
              r"|namespace|new|nullptr|operator|override|private|protected|public"
@@ -599,7 +586,7 @@ _CLIKE_RULES = [
     ("keyword",  _CLIKE_KW),
 ]
 
-# Langages supplémentaires (C-like)
+
 for _lang in ("C", "C++", "C#", "Java", "Go", "Swift", "Kotlin", "PHP"):
     SYNTAX_RULES[_lang] = _CLIKE_RULES + [
         ("builtin", r"\b(print|println|printf|sprintf|fprintf|malloc|free|sizeof"
@@ -700,7 +687,6 @@ SYNTAX_RULES["MATLAB"] = [
                  r"|sum|prod|max|min|mean|std|sort|find|mod|abs|sqrt|exp|log|sin|cos|tan)\b"),
 ]
 
-# ── Règles opérateurs/brackets (ajoutées à chaque langage) ──────────────
 _OP_RULES = [
     ("op_assign", r"(?<![=!<>])=(?!=)|\+=|-=|\*=|/=|%=|\*\*=|//=|&=|\|=|\^=|<<=|>>="),
     ("op_comp",   r"==|!=|<=|>=|<(?!<)|>(?!>)"),
@@ -712,7 +698,7 @@ _OP_RULES = [
     ("bracket_c", r"[{}]"),
 ]
 
-# ── Fallback générique pour tout langage inconnu ─────────────────────────
+
 _GENERIC_RULES = [
     ("comment",  r"(//|#)[^\n]*|/\*[\s\S]*?\*/|<!--[\s\S]*?-->"),
     ("string",   r'("""[\s\S]*?"""|\'\'\'[\s\S]*?\'\'\'|"(?:[^"\\]|\\.)*"|\'(?:[^\'\\]|\\.)*\'|`[^`]*`)'),
@@ -726,7 +712,6 @@ SYNTAX_RULES["Autre"] = _GENERIC_RULES
 SYNTAX_RULES["Auto-detect"] = _GENERIC_RULES
 
 
-# Ajouter opérateurs/brackets à toutes les règles existantes
 for _k in list(SYNTAX_RULES.keys()):
     if _k not in ("Autre", "Auto-detect"):
         SYNTAX_RULES[_k] = SYNTAX_RULES[_k] + _OP_RULES
@@ -775,7 +760,7 @@ class SyntaxHighlighter:
         self._job = None
         lang  = self.lang_var.get()
 
-        # Auto-detect: guess from content
+        
         if lang == "Auto-detect":
             code = self._text.get("1.0", "end-1c")
             lang = detect_lang_from_content(code)
@@ -799,16 +784,13 @@ class SyntaxHighlighter:
                 pass
 
 
-# ─────────────────────────────────────────────
-# ÉDITEUR DE CODE (centre)
-# ─────────────────────────────────────────────
 
 def make_code_editor(master):
     """Éditeur de code avec syntaxe colorée, numéros de lignes et output."""
     frame = ctk.CTkFrame(master, fg_color=BG_DARK)
     frame.pack(fill="both", expand=True)
 
-    # ── Toolbar ──────────────────────────────────────────────────────────
+    
     toolbar = ctk.CTkFrame(frame, fg_color=BG_HEADER, height=38)
     toolbar.pack(fill="x")
     toolbar.pack_propagate(False)
@@ -959,7 +941,7 @@ def make_code_editor(master):
             editor.delete("1.0", "end")
             editor.insert("1.0", code)
             _update_lines()
-            # Détecter la langue depuis l'extension
+            
             import os as _os
             ext  = _os.path.splitext(path)[1].lower()
             lang = EXT_TO_LANG.get(ext, detect_lang_from_content(code))
@@ -968,7 +950,7 @@ def make_code_editor(master):
             status_label.configure(text=f"✓ {os.path.basename(path)} [{lang}]",
                                    text_color="#44ee88")
 
-    ctk.CTkButton(toolbar, text="▶ Run",    command=run_code,     **btn_cfg).pack(side="left", padx=2, pady=5)
+    ctk.CTkButton(toolbar, text="▶  Run ",    command=run_code,     **btn_cfg).pack(side="left", padx=2, pady=5)
     ctk.CTkButton(toolbar, text="📋 Copy",  command=copy_code,    **btn_cfg).pack(side="left", padx=2, pady=5)
     ctk.CTkButton(toolbar, text="💾 Save",  command=save_code,    **btn_cfg).pack(side="left", padx=2, pady=5)
     ctk.CTkButton(toolbar, text="📂 Open",  command=open_file,    **btn_cfg).pack(side="left", padx=2, pady=5)
@@ -977,7 +959,7 @@ def make_code_editor(master):
     status_label = ctk.CTkLabel(toolbar, text="", font=("Arial", 11), text_color="#aaa")
     status_label.pack(side="left", padx=10)
 
-    # ── Éditeur + numéros de lignes ───────────────────────────────────────
+
     editor_frame = ctk.CTkFrame(frame, fg_color="#1e1e1e")
     editor_frame.pack(fill="both", expand=True, padx=0, pady=(4, 0))
 
@@ -1013,7 +995,7 @@ def make_code_editor(master):
     _update_lines()
     highlighter.apply()
 
-    # ── Output ────────────────────────────────────────────────────────────
+    
     ctk.CTkLabel(frame, text="Output", font=("Arial", 11, "bold"),
                  text_color="#555", anchor="w").pack(fill="x", padx=8, pady=(6, 0))
     output_box = ctk.CTkTextbox(
@@ -1032,9 +1014,6 @@ def make_code_editor(master):
     return frame
 
 
-# ─────────────────────────────────────────────
-# CHAT (panneau droit)
-# ─────────────────────────────────────────────
 
 def make_chat_panel(master):
     """Chat intégré dans le panneau droit."""
@@ -1084,14 +1063,12 @@ def make_chat_panel(master):
     return frame
 
 
-# legacy alias
+
 def textarea(master):
     return make_code_editor(master)
 
 
-# ─────────────────────────────────────────────
-# POPUP utilitaire
-# ─────────────────────────────────────────────
+
 
 def _show_popup(master, message: str):
     win = ctk.CTkToplevel(master)
@@ -1102,9 +1079,7 @@ def _show_popup(master, message: str):
     ctk.CTkButton(win, text="OK", width=80, command=win.destroy).pack()
 
 
-# ─────────────────────────────────────────────
-# BARRE DE FORCE DU MOT DE PASSE
-# ─────────────────────────────────────────────
+
 
 class PasswordStrengthBar(ctk.CTkFrame):
     COLORS = ["#ff4444", "#ff8800", "#ffcc00", "#44bb44", "#00cc88"]
@@ -1133,9 +1108,6 @@ class PasswordStrengthBar(ctk.CTkFrame):
         self.label.configure(text=label, text_color=color)
 
 
-# ─────────────────────────────────────────────
-# INSCRIPTION
-# ─────────────────────────────────────────────
 
 class RegisterFrame(ctk.CTkFrame):
     def __init__(self, master, on_success, **kwargs):
@@ -1240,9 +1212,7 @@ class RegisterFrame(ctk.CTkFrame):
         self.on_success(user, welcome=True)
 
 
-# ─────────────────────────────────────────────
-# CONNEXION
-# ─────────────────────────────────────────────
+
 
 class LoginOverlay(ctk.CTkFrame):
     def __init__(self, master, on_success, **kwargs):
@@ -1330,9 +1300,7 @@ class LoginOverlay(ctk.CTkFrame):
         self.on_success(user_data["username"], welcome=True)
 
 
-# ─────────────────────────────────────────────
-# MOT DE PASSE OUBLIÉ
-# ─────────────────────────────────────────────
+
 
 class ForgotPasswordFrame(ctk.CTkFrame):
     def __init__(self, master, **kwargs):
@@ -1413,9 +1381,6 @@ class ForgotPasswordFrame(ctk.CTkFrame):
         self.master.after(2000, self.master.show_login_overlay)
 
 
-# ─────────────────────────────────────────────
-# PAGE DE PROFIL
-# ─────────────────────────────────────────────
 
 class ProfileFrame(ctk.CTkFrame):
     AVATARS = ["👤", "🧑", "👩", "🧔", "👨‍💻", "🧑‍🎨", "🦊", "🐼", "🤖", "🦁"]
@@ -1527,9 +1492,6 @@ class ProfileFrame(ctk.CTkFrame):
 
 
 
-# ─────────────────────────────────────────────
-# SYSTÈME D'AMIS
-# ─────────────────────────────────────────────
 
 def load_friends() -> dict:
     if os.path.exists("friends.json"):
@@ -1609,7 +1571,7 @@ class FriendsPage(ctk.CTkFrame):
         self.on_close = on_close
         self.configure(fg_color=BG_PANEL, width=480, height=580)
 
-        # ── Titre ──────────────────────────────────────────────────────
+        
         header = ctk.CTkFrame(self, fg_color=BG_HEADER, corner_radius=0)
         header.pack(fill="x")
         ctk.CTkLabel(header, text="👥  Mes Amis",
@@ -1618,7 +1580,7 @@ class FriendsPage(ctk.CTkFrame):
                       fg_color="transparent", hover_color="#3a3a3a",
                       command=self._close).pack(side="right", padx=10, pady=10)
 
-        # ── Tabs ───────────────────────────────────────────────────────
+        
         tab_row = ctk.CTkFrame(self, fg_color="#222")
         tab_row.pack(fill="x", pady=(8, 0))
 
@@ -1630,7 +1592,7 @@ class FriendsPage(ctk.CTkFrame):
             b.pack(side="left", padx=4, pady=6)
             self._tab_btns[key] = b
 
-        # ── Contenu ────────────────────────────────────────────────────
+
         self.content = ctk.CTkFrame(self, fg_color=BG_PANEL)
         self.content.pack(fill="both", expand=True, padx=10, pady=10)
 
@@ -1645,7 +1607,7 @@ class FriendsPage(ctk.CTkFrame):
         for b in self._tab_btns.values():
             b.configure(fg_color="#333")
 
-    # ── TAB AMIS ───────────────────────────────────────────────────────
+    
 
     def _show_tab(self, key: str):
         self._clear_content()
@@ -1685,7 +1647,7 @@ class FriendsPage(ctk.CTkFrame):
         remove_friend(self.username, friend)
         self._show_tab("friends")
 
-    # ── TAB DEMANDES ───────────────────────────────────────────────────
+    
 
     def _build_requests(self):
         received = get_requests_received(self.username)
@@ -1736,7 +1698,7 @@ class FriendsPage(ctk.CTkFrame):
         reject_friend_request(self.username, from_user)
         self._show_tab("requests")
 
-    # ── TAB RECHERCHE ──────────────────────────────────────────────────
+    
 
     def _build_search(self):
         search_row = ctk.CTkFrame(self.content, fg_color="transparent")
@@ -1805,9 +1767,6 @@ class FriendsPage(ctk.CTkFrame):
         ctk.CTkLabel(row, text=text, text_color=color,
                      font=("Arial", 12)).pack(side="right", padx=12)
 
-# ─────────────────────────────────────────────
-# BANNIÈRE DE BIENVENUE
-# ─────────────────────────────────────────────
 
 class WelcomeBanner(ctk.CTkFrame):
     def __init__(self, master, username, **kwargs):
@@ -1823,9 +1782,6 @@ class WelcomeBanner(ctk.CTkFrame):
         master.after(4000, self.destroy)
 
 
-# ─────────────────────────────────────────────
-# APP PRINCIPALE
-# ─────────────────────────────────────────────
 
 class App(ctk.CTk):
     def __init__(self):
@@ -1840,7 +1796,7 @@ class App(ctk.CTk):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
 
-        # ── HEADER ──
+        
         self.header = ctk.CTkFrame(self, height=60, corner_radius=0, fg_color=BG_HEADER)
         self.header.grid(row=0, column=0, sticky="ew")
         self.header.grid_propagate(False)
@@ -1869,7 +1825,7 @@ class App(ctk.CTk):
         ctk.CTkButton(self.header, text="X", width=35, fg_color="#c42b1c",
                       command=self.destroy).pack(side="right", padx=20)
 
-        # ── BODY ── (créé avant les boutons qui ont besoin de right_panel)
+        
         self.body_container = ctk.CTkFrame(self, fg_color=BG_DARK)
         self.body_container.grid(row=1, column=0, sticky="nsew")
 
@@ -1877,7 +1833,7 @@ class App(ctk.CTk):
         self.right_panel.pack(side="right", fill="y")
         self.right_panel.pack_propagate(False)
 
-        # ── Boutons header qui dépendent de right_panel ──
+        
         self._voice_panel_ref = {"voice": None}
         make_voice_button(
             self.header,
@@ -1894,12 +1850,12 @@ class App(ctk.CTk):
             on_photo=self._on_photo_captured
         ).pack(side="right", padx=4)
 
-        # ── Chat dans le panneau droit (en haut, au-dessus de cam/vocal) ──
+        
         self._chat_frame = make_chat_panel(self.right_panel)
 
         create_draggable_sash(self.body_container, self.right_panel)
 
-        # ── Éditeur de code au centre ──
+        
         self.main_container = ctk.CTkFrame(self.body_container, fg_color=BG_DARK)
         self.main_container.pack(side="left", fill="both", expand=True)
 
@@ -1908,7 +1864,7 @@ class App(ctk.CTk):
         self.bind_all("<Motion>",   self._reset_inactivity)
         self.bind_all("<KeyPress>", self._reset_inactivity)
 
-        # ── Session persistante ──
+    
         session = load_session()
         if session.get("username"):
             users = load_users()
