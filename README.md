@@ -72,5 +72,4 @@ Limites de l'API Vocale : La reconnaissance vocale nécessite une connexion inte
 
 Performance : Le rafraîchissement de la caméra est bridé à 30ms pour préserver les ressources CPU lors de l'édition de code.
 
-Développé avec ❤️ pour la génération 2026.
 
